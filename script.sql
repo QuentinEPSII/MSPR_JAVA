@@ -15,7 +15,10 @@ CREATE TABLE Users (
 	firstname nvarchar(255),
 	lastname nvarchar(255),
     rights nvarchar(255),
+    isBlocked bit,
+    failedConnections smallint,
     yearStart nvarchar(255),   
+    lastPwdChange DATE,
 	PRIMARY KEY(id)
 );
 
