@@ -99,11 +99,11 @@ CREATE TABLE BusinessProject (
 --insert into Worksite(latitude, longitude, name, startDate, endDate) values ('-33.867886', '-63.987', 'Guitare', '2012-21-10', '2012-21-12');
 
 
-insert into Users(id, firstname, lastname, rights, yearStart) values (1, 'Frédéric', 'Pouchan', 'ADMIN', 2012);
-insert into Users(id, firstname, lastname, rights, yearStart) values (2, 'Quentin', 'GEORGHIOU', 'ADMIN', 2012);
-insert into Users(id, firstname, lastname, rights, yearStart) values (3, 'Nicolas', 'Galy', 'ADMIN', 2012);
-insert into Users(id, firstname, lastname, rights, yearStart) values (4, 'David', 'Cerna', 'ADMIN', 2012);
-insert into Users(id, firstname, lastname, rights, yearStart) values (5, 'Larbin', 'larbin', 'USER', 2010);
+insert into Users(firstname, lastname, rights, yearStart) values ('Frédéric', 'Pouchan', 'ADMIN', 2012);
+insert into Users(firstname, lastname, rights, yearStart) values ('Quentin', 'GEORGHIOU', 'ADMIN', 2012);
+insert into Users(firstname, lastname, rights, yearStart) values ('Nicolas', 'Galy', 'ADMIN', 2012);
+insert into Users(firstname, lastname, rights, yearStart) values ('David', 'Cerna', 'ADMIN', 2012);
+insert into Users(firstname, lastname, rights, yearStart) values ('Larbin', 'larbin', 'USER', 2010);
 
 insert into Worksite(id, latitude, longitude, name, startDate, endDate) values (1, '45.186973698061685', '5.7770144356323145', 'EPSI GRENOBLE', '2013-07-05', '2014-11-14');
 insert into Worksite(id, latitude, longitude, name, startDate, endDate) values (2, '33.747252', '112.633853', 'Triangle', '2012-10-10', '2012-11-10');
