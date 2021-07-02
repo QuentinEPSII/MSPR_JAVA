@@ -1,14 +1,14 @@
 USE mspr_java;
 
---DROP TABLE BusinessIncident;
---DROP TABLE Users_Worksite;
---DROP TABLE BusinessProject;
---DROP TABLE Incident;
---DROP TABLE Video;
---DROP TABLE Projects;
---DROP TABLE Worksite;
---DROP TABLE Users;
---DROP TABLE Business;
+DROP TABLE BusinessIncident;
+DROP TABLE Users_Worksite;
+DROP TABLE BusinessProject;
+DROP TABLE Incident;
+DROP TABLE Video;
+DROP TABLE Projects;
+DROP TABLE Worksite;
+DROP TABLE Users;
+DROP TABLE Business;
 
 CREATE TABLE Users (
 	id INT NOT NULL IDENTITY(1,1),
@@ -48,6 +48,7 @@ CREATE TABLE Video (
     latitude DECIMAL,
     longitude DECIMAL,
     video nvarchar(255),
+    date DATE,
 	PRIMARY KEY(id),
     CONSTRAINT Video_Project_FK FOREIGN KEY (idProject) REFERENCES Projects(id)
 );
@@ -55,6 +56,7 @@ CREATE TABLE Video (
 CREATE TABLE Incident (
 	id INT IDENTITY(1,1),
     idVideo INT NOT NULL,
+    type nvarchar(255),
 	description nvarchar(255),
 	PRIMARY KEY(id),
     CONSTRAINT Incident_Video_FK FOREIGN KEY (idVideo) REFERENCES Video(id)
@@ -70,6 +72,7 @@ CREATE TABLE Users_Worksite (
 
 CREATE TABLE Business (
 	siret INT NOT NULL,
+    profession nvarchar(255),
     name nvarchar(255),
     address nvarchar(255),
     employees INT,
@@ -112,6 +115,12 @@ insert into Worksite(id, latitude, longitude, name, startDate, endDate) values (
 insert into Projects(id, startDate, endDate, idWorksite, name) values (1, '2021-01-01', '2021-12-31', 1, 'Projet N°1');
 insert into Projects(id, startDate, endDate, idWorksite, name) values (2, '2021-02-01', '2021-12-31', 2, 'Projet N°2');
 insert into Projects(id, startDate, endDate, idWorksite, name) values (3, '2021-03-01', '2021-12-31', 3, 'Projet N°3');
+insert into Projects(id, startDate, endDate, idWorksite, name) values (4, '2020-01-01', '2020-12-31', 1, 'Projet N°4');
+insert into Projects(id, startDate, endDate, idWorksite, name) values (5, '2019-02-14', '2020-10-10', 2, 'Projet N°5');
+insert into Projects(id, startDate, endDate, idWorksite, name) values (6, '2020-03-03', '2021-08-01', 3, 'Projet N°6');
+insert into Projects(id, startDate, endDate, idWorksite, name) values (7, '2017-01-05', '2018-12-31', 1, 'Projet N°7');
+insert into Projects(id, startDate, endDate, idWorksite, name) values (8, '2020-02-13', '2021-12-04', 2, 'Projet N°8');
+insert into Projects(id, startDate, endDate, idWorksite, name) values (9, '2013-03-20', '2021-02-25', 3, 'Projet N°9'); 
 
 insert into Video(id, idProject, name, refGant, indoor, latitude, longitude, video) values (1, 1, 'Video test N°1 EPSI GRENOBLE', 42, 1, '45.186973698061685', '5.7770144356323145', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
 insert into Video(id, idProject, name, refGant, indoor, latitude, longitude, video) values (2, 1, 'Video test N°2 Triangle', 27, 0, '33.747252', '112.633853', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
@@ -136,7 +145,6 @@ INSERT INTO BusinessProject VALUES (123456789, 3)
 INSERT INTO BusinessProject VALUES (987654321, 3)
 INSERT INTO BusinessProject VALUES (987654321, 2)
 INSERT INTO BusinessProject VALUES (123456780, 2)
-
 
 insert into BusinessIncident(idIncident, idBusiness) values (1, 123456789);
 insert into BusinessIncident(idIncident, idBusiness) values (2, 987654321);
