@@ -22,14 +22,15 @@ CREATE TABLE Users (
 
 CREATE TABLE Incident (
 	id INT IDENTITY(1,1),
-    idVideo INT,
+    idVideo INT NOT NULL,
 	description nvarchar(255),
-	PRIMARY KEY(id)
+	PRIMARY KEY(id),
+    CONSTRAINT Incident_Video_FK FOREIGN KEY (idVideo) REFERENCES Video(id)
 );
 
 CREATE TABLE Video (
 	id INT NOT NULL,
-    idIncident INT,
+    idProject INT,
 	name nvarchar(255),
     refGant INT,
     indoor bit,
@@ -37,38 +38,35 @@ CREATE TABLE Video (
     longitude DECIMAL,
     video nvarchar(255),
 	PRIMARY KEY(id),
-    CONSTRAINT Video_Incident_FK FOREIGN KEY (idIncident) REFERENCES Incident(id)
+    CONSTRAINT Video_Project_FK FOREIGN KEY (idProject) REFERENCES Project(id)
 );
 
 CREATE TABLE Projects (
 	id INT NOT NULL,
-    idVideo INT,
 	startDate date,
     endDate date,
-	idChantier INT,
+	idWorksite INT,
 	name nvarchar(255),
 	PRIMARY KEY(id),
-    CONSTRAINT Projects_Video_FK FOREIGN KEY (idVideo) REFERENCES Video(id)
+    CONSTRAINT Project_Worksite_FK FOREIGN KEY (idWorksite) REFERENCES Worksite(id)
 );
 
 CREATE TABLE Worksite (
 	id INT NOT NULL,
-    idProject INT,
 	latitude DECIMAL,
     longitude DECIMAL,
     name nvarchar(255),
     startDate DATE,
     endDate DATE,
-	PRIMARY KEY(id),
-    CONSTRAINT Worksite_Project_FK FOREIGN KEY (idProject) REFERENCES Projects(id)
+	PRIMARY KEY(id)
 );
 
 CREATE TABLE Users_Worksite (
-	idChantier INT NOT NULL,
+	idWorksite INT NOT NULL,
 	idUser INT NOT NULL,
-	PRIMARY KEY(idChantier, idUser),
+	PRIMARY KEY(idWorksite, idUser),
     CONSTRAINT UserWorksite_User_FK FOREIGN KEY (idUser) REFERENCES Users(id),
-    CONSTRAINT UserWorksite_Worksite_FK FOREIGN KEY (idChantier) REFERENCES Worksite(id)
+    CONSTRAINT UserWorksite_Worksite_FK FOREIGN KEY (idWorksite) REFERENCES Worksite(id)
 );
 
 CREATE TABLE Business (
