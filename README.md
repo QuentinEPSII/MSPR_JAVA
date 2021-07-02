@@ -1,3 +1,3 @@
 # MSPR_JAVA
 
-test push
+test remote push
