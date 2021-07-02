@@ -1,15 +1,14 @@
 USE mspr_java;
 
-DROP TABLE BusinessIncident;
-DROP TABLE Users_Worksite;
-DROP TABLE BusinessProject;
-DROP TABLE Worksite;
-DROP TABLE Projects;
-DROP TABLE Video;
-DROP TABLE Users;
-DROP TABLE Incident;
-DROP TABLE Business;
-
+--DROP TABLE BusinessIncident;
+--DROP TABLE Users_Worksite;
+--DROP TABLE BusinessProject;
+--DROP TABLE Incident;
+--DROP TABLE Video;
+--DROP TABLE Projects;
+--DROP TABLE Worksite;
+--DROP TABLE Users;
+--DROP TABLE Business;
 
 CREATE TABLE Users (
 	id INT IDENTITY(1,1),
@@ -20,25 +19,14 @@ CREATE TABLE Users (
 	PRIMARY KEY(id)
 );
 
-CREATE TABLE Incident (
-	id INT IDENTITY(1,1),
-    idVideo INT NOT NULL,
-	description nvarchar(255),
-	PRIMARY KEY(id),
-    CONSTRAINT Incident_Video_FK FOREIGN KEY (idVideo) REFERENCES Video(id)
-);
-
-CREATE TABLE Video (
+CREATE TABLE Worksite (
 	id INT NOT NULL,
-    idProject INT,
-	name nvarchar(255),
-    refGant INT,
-    indoor bit,
-    latitude DECIMAL,
+	latitude DECIMAL,
     longitude DECIMAL,
-    video nvarchar(255),
-	PRIMARY KEY(id),
-    CONSTRAINT Video_Project_FK FOREIGN KEY (idProject) REFERENCES Project(id)
+    name nvarchar(255),
+    startDate DATE,
+    endDate DATE,
+	PRIMARY KEY(id)
 );
 
 CREATE TABLE Projects (
@@ -51,14 +39,25 @@ CREATE TABLE Projects (
     CONSTRAINT Project_Worksite_FK FOREIGN KEY (idWorksite) REFERENCES Worksite(id)
 );
 
-CREATE TABLE Worksite (
+CREATE TABLE Video (
 	id INT NOT NULL,
-	latitude DECIMAL,
+    idProject INT,
+	name nvarchar(255),
+    refGant INT,
+    indoor bit,
+    latitude DECIMAL,
     longitude DECIMAL,
-    name nvarchar(255),
-    startDate DATE,
-    endDate DATE,
-	PRIMARY KEY(id)
+    video nvarchar(255),
+	PRIMARY KEY(id),
+    CONSTRAINT Video_Project_FK FOREIGN KEY (idProject) REFERENCES Projects(id)
+);
+
+CREATE TABLE Incident (
+	id INT IDENTITY(1,1),
+    idVideo INT NOT NULL,
+	description nvarchar(255),
+	PRIMARY KEY(id),
+    CONSTRAINT Incident_Video_FK FOREIGN KEY (idVideo) REFERENCES Video(id)
 );
 
 CREATE TABLE Users_Worksite (
