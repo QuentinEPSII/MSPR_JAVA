@@ -14,6 +14,7 @@ CREATE TABLE Users (
 	id INT NOT NULL IDENTITY(1,1),
 	firstname nvarchar(255),
 	lastname nvarchar(255),
+    pwd nvarchar(255),
     rights nvarchar(255),
     isBlocked bit,
     failedConnections smallint,
