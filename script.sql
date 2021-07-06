@@ -19,8 +19,7 @@ CREATE TABLE Users (
     isBlocked bit,
     failedConnections smallint,
     yearStart nvarchar(255),   
-    lastPwdChange DATE,
-	PRIMARY KEY(id)
+    lastPwdChange DATE
 );
 
 CREATE TABLE Worksite (
@@ -68,9 +67,9 @@ CREATE TABLE Incident (
 
 CREATE TABLE Users_Worksite (
 	idWorksite INT NOT NULL,
-	idUser INT NOT NULL,
+	idUser nvarchar(255) NOT NULL,
 	PRIMARY KEY(idWorksite, idUser),
-    CONSTRAINT UserWorksite_User_FK FOREIGN KEY (idUser) REFERENCES Users(id),
+    CONSTRAINT UserWorksite_User_FK FOREIGN KEY (idUser) REFERENCES Users(login),
     CONSTRAINT UserWorksite_Worksite_FK FOREIGN KEY (idWorksite) REFERENCES Worksite(id)
 );
 
