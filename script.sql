@@ -152,3 +152,244 @@ INSERT INTO BusinessProject VALUES (123456780, 2)
 insert into BusinessIncident(idIncident, idBusiness) values (1, 123456789);
 insert into BusinessIncident(idIncident, idBusiness) values (2, 987654321);
 insert into BusinessIncident(idIncident, idBusiness) values (3, 123456780);
+
+
+GO
+----------------------------- Vues -------------------------------
+CREATE OR ALTER VIEW projectsAfterDate AS
+	SELECT name, startDate, endDate 
+		FROM Projects p
+		WHERE startDate >= '20210125';
+
+GO
+
+CREATE OR ALTER VIEW projectInfo AS
+	SELECT w.name worksiteName, b.name businessName, b.profession businessProfession, v.video
+	FROM Projects p
+		JOIN Worksite w ON w.id = p.idWorksite
+		JOIN BusinessProject bp ON bp.idProject = p.id
+		JOIN Business b ON b.siret = bp.idBusiness
+		JOIN Video v ON v.idProject = p.id
+		WHERE p.id = 2
+GO
+
+CREATE OR ALTER VIEW projectCount2021 AS 
+SELECT count(*) nombre
+	FROM Projects p
+	WHERE year(p.startDate) = 2021
+	
+GO
+CREATE OR ALTER VIEW businessCountPerProjectAndProfession As
+	SELECT p.name, b.profession, count(*) number
+	FROM Projects p
+		JOIN Worksite w ON w.id = p.idWorksite
+		JOIN BusinessProject bp ON bp.idProject = p.id
+		JOIN Business b ON b.siret = bp.idBusiness
+		GROUP BY p.name, b.profession
+GO
+
+
+----------------------------- Fonctions -------------------------------
+
+CREATE OR ALTER FUNCTION dbo.getProjects (@startDate as DATE, @endDate as DATE)
+RETURNS @retProjects TABLE
+(
+    temporayTableID INT IDENTITY,
+    projectName nvarchar(255) NOT NULL,
+    businessName nvarchar(255) NOT NULL,
+    worksiteLongitude decimal NOT NULL,
+    worksiteLatitude decimal NOT NULL,
+	projectStartDate DATE NOT NULL,
+	projectEndDate DATE
+) 
+AS
+BEGIN
+	WITH commonTableExpression 
+		AS 
+		(
+			SELECT p.name projectName, w.longitude worksiteLongitude, w.latitude worksiteLatitude, b.name businessName, p.startDate projectStartDate, p.endDate projectEndDate
+			FROM Projects p
+				JOIN BusinessProject bp ON p.id = bp.idProject
+				JOIN Business b ON b.siret = bp.idBusiness
+				JOIN Worksite w ON w.id = p.idWorksite
+				WHERE p.startDate >= @startDate AND  p.endDate <= @endDate
+		)
+		INSERT @retProjects(projectName, businessName, worksiteLongitude, worksiteLatitude, projectStartDate, projectEndDate)
+		SELECT projectName, businessName, worksiteLongitude, worksiteLatitude, projectStartDate, projectEndDate
+		FROM commonTableExpression
+
+	RETURN
+END;
+
+GO
+
+CREATE OR ALTER FUNCTION checkPwd (@password nvarchar(255))
+RETURNS BIT
+AS
+BEGIN 
+-- TODO implement other rules
+	IF LEN(@password) < 8
+		RETURN 1
+	RETURN 0
+END;
+
+GO
+
+
+
+----------------------------- Procédures ------------------------------
+
+CREATE OR ALTER PROCEDURE CreateUser 
+	@CodeApplication char(1),
+	@Nom nvarchar(255),
+	@Prenom nvarchar(255),
+	@ChantierId int
+AS
+	SET NOCOUNT ON;
+	DECLARE @login NVARCHAR(50), @annee INT;
+	SET @annee = YEAR(GETDATE())
+	SET @login = CONCAT(@CodeApplication, @annee , '_', SUBSTRING(@Prenom, 1, 2), SUBSTRING(@Nom, 1, 2));
+	BEGIN TRY
+		BEGIN TRANSACTION
+			INSERT INTO Users (login, firstname, lastname, pwd, failedConnections, yearStart)
+				VALUES (@login, @Prenom, @Nom, @login, 0, @annee);
+			INSERT INTO Users_Worksite (idUser, idWorksite)
+				VALUES(@login, @ChantierId)
+		COMMIT
+		RETURN 1
+	END TRY
+
+	BEGIN CATCH
+		IF @@TRANCOUNT > 0
+			ROLLBACK
+		RETURN 0
+	END CATCH;
+
+GO
+
+CREATE OR ALTER PROCEDURE ConnectUser 
+	@username nvarchar(255),
+	@pwd nvarchar(255)
+AS
+	DECLARE @lastchange Date, 
+		@isBlocked bit, 
+		@password nvarchar(255), 
+		@failedConnections smallint;
+
+	SELECT @lastChange= lastPwdChange, @isBlocked = isBlocked, @password = pwd, @failedConnections = failedConnections
+	FROM Users WHERE @username = login
+
+	IF DATEDIFF(month, @lastchange, GETDATE()) >= 2
+		THROW 50000, 'Password needs to be changed', 1
+	-- En cas de succès
+	--TODO encryption
+	IF @pwd = @password
+		BEGIN
+		UPDATE Users
+		SET failedConnections = 0
+		WHERE login = @username
+		RETURN 0
+		END;
+	-- En cas d'échec
+	ELSE
+		BEGIN
+		UPDATE Users 
+		SET failedConnections = failedConnections + 1
+		WHERE login = @username
+		IF (SELECT failedConnections FROM Users WHERE @username = login) >= 3
+			UPDATE Users
+			SET isBlocked = 1
+			WHERE login = @username
+		RETURN 1;
+		END;
+
+GO
+
+CREATE OR ALTER PROCEDURE checkAuthorization 
+    @userName nvarchar(255), 
+    @ChantierId int
+AS 
+DECLARE @authorization bit;
+DECLARE @idUserName INT;
+SET @authorization = 0;
+
+IF EXISTS (SELECT idUser from dbo.Users_Worksite where idWorksite = @ChantierId and idUser = @userName)
+	SET @authorization = 1;
+
+RETURN @authorization;
+
+
+GO
+
+CREATE OR ALTER PROCEDURE UnlockUser (@username nvarchar)
+AS
+	UPDATE Users
+	SET isBlocked = 0, failedConnections = 0
+	WHERE login = @username
+
+GO
+
+CREATE OR ALTER PROCEDURE ChangePwd @userName nvarchar(255), @oldPwd nvarchar(255), @newPwd nvarchar(255)
+AS 
+	IF @newPwd = @userName
+		THROW 60000, 'Password and login shouldn''t be identical', 1;
+	IF @newPwd = @oldPwd
+		THROW 60000, 'new and old passwords shouldn''t be identical', 1;
+	IF dbo.checkPwd(@newPwd) = 1
+		THROW 60000, 'Password is too weak', 1;
+	IF NOT EXISTS (SELECT 1 FROM Users WHERE login = @userName AND pwd = @oldPwd)
+		THROW 60000, 'Old password is wrong', 1;
+	UPDATE Users 
+	SET pwd =  @newPwd, lastPwdChange = GETDATE(), failedConnections = 0
+	WHERE login = @userName
+
+GO
+CREATE OR ALTER PROCEDURE affectUser 
+    @userName nvarchar(255), 
+    @ChantierId int
+AS 
+INSERT INTO Users_Worksite(idWorksite, idUser) values (@ChantierId, @userName);
+
+GO
+
+
+
+----------------------------- Triggers --------------------------------
+
+CREATE OR ALTER TRIGGER IncidentUniqueTrigger ON dbo.Incident
+INSTEAD OF INSERT  
+AS  
+
+DECLARE @typeInsert nvarchar(255);
+DECLARE @DateInsert Date;
+DECLARE @DateCastInsert nvarchar(255);
+
+SET @TypeInsert = (SELECT type from inserted);
+SET @DateInsert = (SELECT date from dbo.Video where id = (SELECT idVideo from inserted));
+SET @DateCastInsert = CAST(@DateInsert as nvarchar(255));
+
+IF EXISTS (SELECT type from dbo.Incident i join dbo.Video v ON v.id = i.idVideo where type = @TypeInsert and v.date = @DateInsert)
+	BEGIN
+
+	RAISERROR ('Attention, un incident du type '' %s '' a déjà été renseigné pour à la date suivante : %s ', 16, 1, @TypeInsert, @DateCastInsert);  
+	RETURN;
+	END;
+ELSE
+	BEGIN
+	INSERT INTO dbo.Incident(idVideo, type, description) SELECT idVideo, type, description from inserted
+	END;
+GO 
+
+
+
+----------------------------- Application roles --------------------------------
+GO
+CREATE APPLICATION ROLE worksiteApp WITH PASSWORD = '(mobileApp)'
+CREATE APPLICATION ROLE desktopApp WITH PASSWORD = '(desktopApp)'
+
+
+
+
+
+----------------------------- Permissions --------------------------------
+GRANT SELECT ON dbo.getProjects TO worksiteApp
