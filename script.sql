@@ -11,15 +11,15 @@ DROP TABLE Users;
 DROP TABLE Business;
 
 CREATE TABLE Users (
-	id INT NOT NULL IDENTITY(1,1),
+	login nvarchar(255) PRIMARY KEY,
 	firstname nvarchar(255),
 	lastname nvarchar(255),
+    pwd nvarchar(255),
     rights nvarchar(255),
     isBlocked bit,
     failedConnections smallint,
     yearStart nvarchar(255),   
-    lastPwdChange DATE,
-	PRIMARY KEY(id)
+    lastPwdChange DATE
 );
 
 CREATE TABLE Worksite (
@@ -67,9 +67,9 @@ CREATE TABLE Incident (
 
 CREATE TABLE Users_Worksite (
 	idWorksite INT NOT NULL,
-	idUser INT NOT NULL,
+	idUser nvarchar(255) NOT NULL,
 	PRIMARY KEY(idWorksite, idUser),
-    CONSTRAINT UserWorksite_User_FK FOREIGN KEY (idUser) REFERENCES Users(id),
+    CONSTRAINT UserWorksite_User_FK FOREIGN KEY (idUser) REFERENCES Users(login),
     CONSTRAINT UserWorksite_Worksite_FK FOREIGN KEY (idWorksite) REFERENCES Worksite(id)
 );
 
@@ -105,11 +105,11 @@ CREATE TABLE BusinessProject (
 --insert into Worksite(latitude, longitude, name, startDate, endDate) values ('-33.867886', '-63.987', 'Guitare', '2012-21-10', '2012-21-12');
 
 
-insert into Users(firstname, lastname, rights, yearStart) values ('Frédéric', 'Pouchan', 'ADMIN', 2012);
-insert into Users(firstname, lastname, rights, yearStart) values ('Quentin', 'GEORGHIOU', 'ADMIN', 2012);
-insert into Users(firstname, lastname, rights, yearStart) values ('Nicolas', 'Galy', 'ADMIN', 2012);
-insert into Users(firstname, lastname, rights, yearStart) values ('David', 'Cerna', 'ADMIN', 2012);
-insert into Users(firstname, lastname, rights, yearStart) values ('Larbin', 'larbin', 'USER', 2010);
+insert into Users(login, firstname, lastname, rights, yearStart) values ('fpouchan', 'Frédéric', 'Pouchan', 'ADMIN', 2012);
+insert into Users(login, firstname, lastname, rights, yearStart) values ('qgeorghioui', 'Quentin', 'GEORGHIOU', 'ADMIN', 2012);
+insert into Users(login, firstname, lastname, rights, yearStart) values ('ngaly', 'Nicolas', 'Galy', 'ADMIN', 2012);
+insert into Users(login, firstname, lastname, rights, yearStart) values ('dcerna', 'David', 'Cerna', 'ADMIN', 2012);
+insert into Users(login, firstname, lastname, rights, yearStart) values ('llarbin', 'Larbin', 'larbin', 'USER', 2010);
 
 insert into Worksite(id, latitude, longitude, name, startDate, endDate) values (1, '45.186973698061685', '5.7770144356323145', 'EPSI GRENOBLE', '2013-07-05', '2014-11-14');
 insert into Worksite(id, latitude, longitude, name, startDate, endDate) values (2, '33.747252', '112.633853', 'Triangle', '2012-10-10', '2012-11-10');
