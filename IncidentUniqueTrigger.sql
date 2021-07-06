@@ -10,7 +10,6 @@ SET @TypeInsert = (SELECT type from inserted);
 SET @DateInsert = (SELECT date from dbo.Video where id = (SELECT idVideo from inserted));
 SET @DateCastInsert = CAST(@DateInsert as nvarchar(255));
 
-
 IF EXISTS (SELECT type from dbo.Incident i join dbo.Video v ON v.id = i.idVideo where type = @TypeInsert and v.date = @DateInsert)
 	BEGIN
 
@@ -22,6 +21,5 @@ ELSE
 	INSERT INTO dbo.Incident(idVideo, type, description) SELECT idVideo, type, description from inserted
 	END;
 GO 
-
 
 --Drop Trigger IncidentUniqueTrigger;
