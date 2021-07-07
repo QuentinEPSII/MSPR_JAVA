@@ -1,4 +1,4 @@
-CREATE PROCEDURE checkAuthorization 
+CREATE OR ALTER PROCEDURE checkAuthorization 
     @userName nvarchar(255), 
     @ChantierId int
 AS 

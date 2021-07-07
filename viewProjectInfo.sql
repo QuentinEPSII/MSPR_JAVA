@@ -1,4 +1,4 @@
-CREATE VIEW projectInfo AS
+CREATE OR ALTER VIEW projectInfo AS
 	SELECT w.name worksiteName, b.name businessName, b.profession businessProfession, v.video
 	FROM Projects p
 		JOIN Worksite w ON w.id = p.idWorksite

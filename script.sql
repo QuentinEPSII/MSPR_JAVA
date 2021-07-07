@@ -10,6 +10,9 @@ DROP TABLE Worksite;
 DROP TABLE Users;
 DROP TABLE Business;
 
+DROP APPLICATION ROLE worksiteApp
+DROP APPLICATION ROLE desktopApp 
+
 CREATE TABLE Users (
 	login nvarchar(255) PRIMARY KEY,
 	firstname nvarchar(255),
@@ -393,3 +396,6 @@ CREATE APPLICATION ROLE desktopApp WITH PASSWORD = '(desktopApp)'
 
 ----------------------------- Permissions --------------------------------
 GRANT SELECT ON dbo.getProjects TO worksiteApp
+
+GRANT EXEC TO desktopApp
+GRANT SELECT TO desktopAPP
