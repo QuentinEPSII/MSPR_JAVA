@@ -108,11 +108,11 @@ CREATE TABLE BusinessProject (
 --insert into Worksite(latitude, longitude, name, startDate, endDate) values ('-33.867886', '-63.987', 'Guitare', '2012-21-10', '2012-21-12');
 
 
-insert into Users(login, firstname, lastname, pwd, rights, yearStart, failedConnections) values ('fpouchan', 'Frédéric',  'Pouchan', HASHBYTES('SHA2_256', 'motdepasse'), 'ADMIN', 2012, 0);
-insert into Users(login, firstname, lastname, pwd, rights, yearStart, failedConnections) values ('qgeorghioui',  'Quentin', HASHBYTES('SHA2_256', 'motdepasse'), 'GEORGHIOU', 'ADMIN', 2012, 0);
-insert into Users(login, firstname, lastname, pwd, rights, yearStart, failedConnections) values ('ngaly', 'Nicolas',  'Galy', HASHBYTES('SHA2_256', 'motdepasse'), 'ADMIN', 2012, 0);
-insert into Users(login, firstname, lastname, pwd, rights, yearStart, failedConnections) values ('dcerna', 'David',  'Cerna', HASHBYTES('SHA2_256', 'motdepasse'),'ADMIN', 2012, 0);
-insert into Users(login, firstname, lastname, pwd, rights, yearStart, failedConnections) values ('llarbin', 'Larbin', 'larbin', HASHBYTES('SHA2_256', 'motdepasse'), 'USER', 2010, 0);
+insert into Users(login, firstname, lastname, pwd, rights, yearStart, failedConnections) values ('fpouchan', 'Frédéric',  'Pouchan','motdepasse', 'ADMIN', 2012, 0);
+insert into Users(login, firstname, lastname, pwd, rights, yearStart, failedConnections) values ('qgeorghioui',  'Quentin', 'motdepasse', 'GEORGHIOU', 'ADMIN', 2012, 0);
+insert into Users(login, firstname, lastname, pwd, rights, yearStart, failedConnections) values ('ngaly', 'Nicolas',  'Galy', 'motdepasse', 'ADMIN', 2012, 0);
+insert into Users(login, firstname, lastname, pwd, rights, yearStart, failedConnections) values ('dcerna', 'David',  'Cerna', 'motdepasse','ADMIN', 2012, 0);
+insert into Users(login, firstname, lastname, pwd, rights, yearStart, failedConnections) values ('llarbin', 'Larbin', 'larbin', 'motdepasse', 'USER', 2010, 0);
 
 insert into Worksite(id, latitude, longitude, name, startDate, endDate) values (1, '45.186973698061685', '5.7770144356323145', 'EPSI GRENOBLE', '2013-07-05', '2014-11-14');
 insert into Worksite(id, latitude, longitude, name, startDate, endDate) values (2, '33.747252', '112.633853', 'Triangle', '2012-10-10', '2012-11-10');
@@ -128,15 +128,15 @@ insert into Projects(id, startDate, endDate, idWorksite, name) values (7, '2017-
 insert into Projects(id, startDate, endDate, idWorksite, name) values (8, '2020-02-13', '2021-12-04', 2, 'Projet N°8');
 insert into Projects(id, startDate, endDate, idWorksite, name) values (9, '2013-03-20', '2021-02-25', 3, 'Projet N°9'); 
 
-insert into Video(id, idProject, name, refGant, indoor, latitude, longitude, video) values (1, 1, 'Video test N°1 EPSI GRENOBLE', 42, 1, '45.186973698061685', '5.7770144356323145', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
-insert into Video(id, idProject, name, refGant, indoor, latitude, longitude, video) values (2, 1, 'Video test N°2 Triangle', 27, 0, '33.747252', '112.633853', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
-insert into Video(id, idProject, name, refGant, indoor, latitude, longitude, video) values (3, 3, 'Video test N°3 Guitare', 12, 1, '-33.867886', '-63.987', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
-insert into Video(id, idProject, name, refGant, indoor, latitude, longitude, video) values (4, 3, 'Video test N°4 Rien de fou', 12, 1, '-33.867886', '-63.987', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
-insert into Video(id, idProject, name, refGant, indoor, latitude, longitude, video) values (5, 2, 'Video test N°5 Toujours rien de fou', 12, 1, '-33.867886', '-63.987', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+insert into Video(id, idProject, name, refGant, indoor, latitude, longitude, video, date) values (1, 1, 'Video test N°1 EPSI GRENOBLE', 42, 1, '45.186973698061685', '5.7770144356323145', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', GETDATE());
+insert into Video(id, idProject, name, refGant, indoor, latitude, longitude, video, date) values (2, 1, 'Video test N°2 Triangle', 27, 0, '33.747252', '112.633853', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', GETDATE());
+insert into Video(id, idProject, name, refGant, indoor, latitude, longitude, video, date) values (3, 3, 'Video test N°3 Guitare', 12, 1, '-33.867886', '-63.987', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', GETDATE());
+insert into Video(id, idProject, name, refGant, indoor, latitude, longitude, video, date) values (4, 3, 'Video test N°4 Rien de fou', 12, 1, '-33.867886', '-63.987', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', GETDATE());
+insert into Video(id, idProject, name, refGant, indoor, latitude, longitude, video, date) values (5, 2, 'Video test N°5 Toujours rien de fou', 12, 1, '-33.867886', '-63.987', 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', GETDATE());
 
-INSERT INTO Incident(idVideo, description) VALUES (1, 'Une description où je ne sais pas vraiment quoi dire');
-INSERT INTO Incident(idVideo, description) VALUES (2, 'Il y a eu un gros incident la wow');
-INSERT INTO Incident(idVideo, description) VALUES (3, 'Un café renversé');
+INSERT INTO Incident(idVideo, description, type) VALUES (1, 'Une description où je ne sais pas vraiment quoi dire', 1);
+INSERT INTO Incident(idVideo, description, type) VALUES (2, 'Il y a eu un gros incident la wow', 1);
+INSERT INTO Incident(idVideo, description, type) VALUES (3, 'Un café renversé', 1);
 
 insert into Users_Worksite(idWorksite, idUser) values (1, 'fpouchan');
 insert into Users_Worksite(idWorksite, idUser) values (2, 'qgeorghioui');
@@ -226,7 +226,7 @@ END;
 
 GO
 
-CREATE OR ALTER FUNCTION checkPwd (@password nvarchar(255))
+CREATE OR ALTER FUNCTION dbo.checkPwd (@password nvarchar(255))
 RETURNS BIT
 AS
 BEGIN 
@@ -239,6 +239,21 @@ END;
 GO
 
 
+CREATE OR ALTER FUNCTION dbo.checkAuthorization (@userName nvarchar(255), @ChantierId int)
+RETURNS bit
+AS
+BEGIN
+	DECLARE @authorization bit;
+	DECLARE @idUserName INT;
+	SET @authorization = 0;
+
+	IF EXISTS (SELECT idUser from dbo.Users_Worksite where idWorksite = @ChantierId and idUser = @userName)
+		SET @authorization = 1;
+
+	RETURN @authorization;
+END;
+
+GO
 
 ----------------------------- Procédures ------------------------------
 
@@ -255,7 +270,7 @@ AS
 	BEGIN TRY
 		BEGIN TRANSACTION
 			INSERT INTO Users (login, firstname, lastname, pwd, failedConnections, yearStart)
-				VALUES (@login, @Prenom, @Nom, HASHBYTES('SHA2_256', @login), 0, @annee);
+				VALUES (@login, @Prenom, @Nom,  @login, 0, @annee);
 			INSERT INTO Users_Worksite (idUser, idWorksite)
 				VALUES(@login, @ChantierId)
 		COMMIT
@@ -285,12 +300,12 @@ AS
 	IF @isBlocked = 1
 		THROW 50000, 'Account is blocked. Please contact an administrator', 1
 		
-	IF DATEDIFF(month, @lastchange, GETDATE()) >= 2
+	IF @lastchange is NULL OR DATEDIFF(month, @lastchange, GETDATE()) >= 2
 		THROW 50000, 'Password needs to be changed', 1
 
 
 	-- En cas de succès
-	IF HASHBYTES('SHA2_256', @pwd) = @password
+	IF @pwd = @password
 		BEGIN
 		UPDATE Users
 		SET failedConnections = 0
@@ -310,25 +325,10 @@ AS
 		RETURN 1;
 		END;
 
-GO
-
-CREATE OR ALTER PROCEDURE checkAuthorization 
-    @userName nvarchar(255), 
-    @ChantierId int
-AS 
-DECLARE @authorization bit;
-DECLARE @idUserName INT;
-SET @authorization = 0;
-
-IF EXISTS (SELECT idUser from dbo.Users_Worksite where idWorksite = @ChantierId and idUser = @userName)
-	SET @authorization = 1;
-
-RETURN @authorization;
-
 
 GO
 
-CREATE OR ALTER PROCEDURE UnlockUser (@username nvarchar)
+CREATE OR ALTER PROCEDURE UnlockUser (@username nvarchar(255))
 AS
 	UPDATE Users
 	SET isBlocked = 0, failedConnections = 0
@@ -386,10 +386,10 @@ AS
 		THROW 60000, 'new and old passwords shouldn''t be identical', 1;
 	IF dbo.checkPwd(@newPwd) = 1
 		THROW 60000, 'Password is too weak', 1;
-	IF NOT EXISTS (SELECT 1 FROM Users WHERE login = @userName AND pwd =  HASHBYTES('SHA2_256', @oldPwd))
+	IF NOT EXISTS (SELECT 1 FROM Users WHERE login = @userName AND pwd = @oldPwd)
 		THROW 60000, 'Old password is wrong', 1;
 	UPDATE Users 
-	SET pwd =  HASHBYTES('SHA2_256', @newPwd), lastPwdChange = GETDATE(), failedConnections = 0
+	SET pwd =  @newPwd, lastPwdChange = GETDATE(), failedConnections = 0
 	WHERE login = @userName
 
 GO
@@ -417,7 +417,7 @@ SET @TypeInsert = (SELECT type from inserted);
 SET @DateInsert = (SELECT date from dbo.Video where id = (SELECT idVideo from inserted));
 SET @DateCastInsert = CAST(@DateInsert as nvarchar(255));
 
-IF EXISTS (SELECT type from dbo.Incident i join dbo.Video v ON v.id = i.idVideo where type = @TypeInsert and v.date = @DateInsert)
+IF EXISTS (SELECT type from dbo.Incident i join dbo.Video v ON v.id = i.idVideo where i.type = @TypeInsert and v.date = @DateInsert)
 	BEGIN
 
 	RAISERROR ('Attention, un incident du type '' %s '' a déjà été renseigné pour à la date suivante : %s ', 16, 1, @TypeInsert, @DateCastInsert);  
