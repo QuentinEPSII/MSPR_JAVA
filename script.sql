@@ -10,6 +10,9 @@ DROP TABLE Worksite;
 DROP TABLE Users;
 DROP TABLE Business;
 
+DROP APPLICATION ROLE worksiteApp
+DROP APPLICATION ROLE desktopApp 
+
 CREATE TABLE Users (
 	login nvarchar(255) PRIMARY KEY,
 	firstname nvarchar(255),
@@ -17,7 +20,7 @@ CREATE TABLE Users (
     pwd nvarchar(255),
     rights nvarchar(255),
     isBlocked bit,
-    failedConnections smallint,
+    failedConnections smallint NOT NULL,
     yearStart nvarchar(255),   
     lastPwdChange DATE
 );
@@ -105,11 +108,11 @@ CREATE TABLE BusinessProject (
 --insert into Worksite(latitude, longitude, name, startDate, endDate) values ('-33.867886', '-63.987', 'Guitare', '2012-21-10', '2012-21-12');
 
 
-insert into Users(login, firstname, lastname, rights, yearStart) values ('fpouchan', 'Frédéric', 'Pouchan', 'ADMIN', 2012);
-insert into Users(login, firstname, lastname, rights, yearStart) values ('qgeorghioui', 'Quentin', 'GEORGHIOU', 'ADMIN', 2012);
-insert into Users(login, firstname, lastname, rights, yearStart) values ('ngaly', 'Nicolas', 'Galy', 'ADMIN', 2012);
-insert into Users(login, firstname, lastname, rights, yearStart) values ('dcerna', 'David', 'Cerna', 'ADMIN', 2012);
-insert into Users(login, firstname, lastname, rights, yearStart) values ('llarbin', 'Larbin', 'larbin', 'USER', 2010);
+insert into Users(login, firstname, lastname, pwd, rights, yearStart, failedConnections) values ('fpouchan', 'Frédéric',  'Pouchan', HASHBYTES('SHA2_256', 'motdepasse'), 'ADMIN', 2012, 0);
+insert into Users(login, firstname, lastname, pwd, rights, yearStart, failedConnections) values ('qgeorghioui',  'Quentin', HASHBYTES('SHA2_256', 'motdepasse'), 'GEORGHIOU', 'ADMIN', 2012, 0);
+insert into Users(login, firstname, lastname, pwd, rights, yearStart, failedConnections) values ('ngaly', 'Nicolas',  'Galy', HASHBYTES('SHA2_256', 'motdepasse'), 'ADMIN', 2012, 0);
+insert into Users(login, firstname, lastname, pwd, rights, yearStart, failedConnections) values ('dcerna', 'David',  'Cerna', HASHBYTES('SHA2_256', 'motdepasse'),'ADMIN', 2012, 0);
+insert into Users(login, firstname, lastname, pwd, rights, yearStart, failedConnections) values ('llarbin', 'Larbin', 'larbin', HASHBYTES('SHA2_256', 'motdepasse'), 'USER', 2010, 0);
 
 insert into Worksite(id, latitude, longitude, name, startDate, endDate) values (1, '45.186973698061685', '5.7770144356323145', 'EPSI GRENOBLE', '2013-07-05', '2014-11-14');
 insert into Worksite(id, latitude, longitude, name, startDate, endDate) values (2, '33.747252', '112.633853', 'Triangle', '2012-10-10', '2012-11-10');
@@ -252,7 +255,7 @@ AS
 	BEGIN TRY
 		BEGIN TRANSACTION
 			INSERT INTO Users (login, firstname, lastname, pwd, failedConnections, yearStart)
-				VALUES (@login, @Prenom, @Nom, @login, 0, @annee);
+				VALUES (@login, @Prenom, @Nom, HASHBYTES('SHA2_256', @login), 0, @annee);
 			INSERT INTO Users_Worksite (idUser, idWorksite)
 				VALUES(@login, @ChantierId)
 		COMMIT
@@ -279,11 +282,15 @@ AS
 	SELECT @lastChange= lastPwdChange, @isBlocked = isBlocked, @password = pwd, @failedConnections = failedConnections
 	FROM Users WHERE @username = login
 
+	IF @isBlocked = 1
+		THROW 50000, 'Account is blocked. Please contact an administrator', 1
+		
 	IF DATEDIFF(month, @lastchange, GETDATE()) >= 2
 		THROW 50000, 'Password needs to be changed', 1
+
+
 	-- En cas de succès
-	--TODO encryption
-	IF @pwd = @password
+	IF HASHBYTES('SHA2_256', @pwd) = @password
 		BEGIN
 		UPDATE Users
 		SET failedConnections = 0
@@ -329,6 +336,48 @@ AS
 
 GO
 
+CREATE OR ALTER FUNCTION checkPwd (@password nvarchar(255))
+RETURNS BIT
+AS
+BEGIN 
+-- TODO implement other rules
+	IF LEN(@password) < 8
+		RETURN 1
+	RETURN 0
+END;
+
+GO
+
+CREATE OR ALTER PROCEDURE UnlockUser (@username nvarchar(255))
+AS
+	UPDATE Users
+	SET isBlocked = 0, failedConnections = 0
+	WHERE login = @username
+
+GO
+
+
+CREATE OR ALTER FUNCTION checkPwd (@password nvarchar(255))
+RETURNS BIT
+AS
+BEGIN 
+-- TODO implement other rules
+	IF LEN(@password) < 8
+		RETURN 1
+	RETURN 0
+END;
+
+GO
+
+CREATE OR ALTER PROCEDURE UnlockUser (@username nvarchar)
+AS
+	UPDATE Users
+	SET isBlocked = 0, failedConnections = 0
+	WHERE login = @username
+
+GO
+
+
 CREATE OR ALTER PROCEDURE ChangePwd @userName nvarchar(255), @oldPwd nvarchar(255), @newPwd nvarchar(255)
 AS 
 	IF @newPwd = @userName
@@ -337,10 +386,10 @@ AS
 		THROW 60000, 'new and old passwords shouldn''t be identical', 1;
 	IF dbo.checkPwd(@newPwd) = 1
 		THROW 60000, 'Password is too weak', 1;
-	IF NOT EXISTS (SELECT 1 FROM Users WHERE login = @userName AND pwd = @oldPwd)
+	IF NOT EXISTS (SELECT 1 FROM Users WHERE login = @userName AND pwd =  HASHBYTES('SHA2_256', @oldPwd))
 		THROW 60000, 'Old password is wrong', 1;
 	UPDATE Users 
-	SET pwd =  @newPwd, lastPwdChange = GETDATE(), failedConnections = 0
+	SET pwd =  HASHBYTES('SHA2_256', @newPwd), lastPwdChange = GETDATE(), failedConnections = 0
 	WHERE login = @userName
 
 GO
