@@ -10,7 +10,7 @@ END;
 
 GO
 
-CREATE OR ALTER PROCEDURE UnlockUser (@username nvarchar)
+CREATE OR ALTER PROCEDURE UnlockUser (@username nvarchar(255))
 AS
 	UPDATE Users
 	SET isBlocked = 0, failedConnections = 0
@@ -27,12 +27,16 @@ AS
 		THROW 60000, 'new and old passwords shouldn''t be identical', 1;
 	IF dbo.checkPwd(@newPwd) = 1
 		THROW 60000, 'Password is too weak', 1;
-	IF NOT EXISTS (SELECT 1 FROM Users WHERE login = @userName AND pwd = @oldPwd)
+	IF NOT EXISTS (SELECT 1 FROM Users WHERE login = @userName AND pwd =  HASHBYTES('SHA2_256', @oldPwd))
 		THROW 60000, 'Old password is wrong', 1;
 	UPDATE Users 
-	SET pwd =  @newPwd, lastPwdChange = GETDATE(), failedConnections = 0
+	SET pwd =  HASHBYTES('SHA2_256', @newPwd), lastPwdChange = GETDATE(), failedConnections = 0
 	WHERE login = @userName
 
 GO
 
 
+
+EXEC ChangePwd 'ngaly', 'motdepasse', 'motdepasse2'
+
+SELECT * FROM Users

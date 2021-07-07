@@ -11,7 +11,7 @@ AS
 	BEGIN TRY
 		BEGIN TRANSACTION
 			INSERT INTO Users (login, firstname, lastname, pwd, failedConnections, yearStart)
-				VALUES (@login, @Prenom, @Nom, @login, 0, @annee);
+				VALUES (@login, @Prenom, @Nom, HASHBYTES('SHA2_256', @login), 0, @annee);
 			INSERT INTO Users_Worksite (idUser, idWorksite)
 				VALUES(@login, @ChantierId)
 		COMMIT

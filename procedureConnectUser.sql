@@ -14,7 +14,7 @@ AS
 		THROW 50000, 'Password needs to be changed', 1
 	-- En cas de succès
 	--TODO encryption
-	IF @pwd = @password
+	IF HASHBYTES('SHA2_256', @pwd) = @password
 		BEGIN
 		UPDATE Users
 		SET failedConnections = 0
@@ -35,4 +35,6 @@ AS
 		END;
 
 
-EXEC dbo.ConnectUser 'C2021_NiGa', 'grege'
+DECLARE @moncul smallint;
+EXECUTE @moncul = dbo.ConnectUser 'ngaly', 'motdepasse'
+SELECT @moncul
